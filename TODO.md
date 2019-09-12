@@ -2,6 +2,4 @@
 
 * Serve `shares.json`
 * UDP broadcast of server
-* Daemon
 * Tests
-* Makefile
