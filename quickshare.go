@@ -64,11 +64,16 @@ func RemoveShare(name string) (bool) {
 
 /** Send the given share to the client */
 func sendFile(w http.ResponseWriter, share Share) (error) {
+	stats, err := os.Stat("/path/to/file");	
+	if err != nil { return err }
+	
     file, err := os.Open(share.Filename)
-    if err != nil {
-        file.Close()
-        return err
-    }
+    defer file.Close()
+    if err != nil { return err }
+    
+    // All good so far. Write headers
+    w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", share.Name))
+    w.Header().Set("Content-Length", fmt.Sprintf("%d", stats.Size()))
     
     buffer := make([]byte, 8192)
     bytes := 0
@@ -76,14 +81,12 @@ func sendFile(w http.ResponseWriter, share Share) (error) {
         count, err := file.Read(buffer)
         if err == io.EOF { break }
         if err != nil {
-            file.Close()
             return err
         }
         w.Write(buffer[:count])
         bytes += count
     }
     
-    file.Close()
     return nil
 }
 
