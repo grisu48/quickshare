@@ -291,8 +291,7 @@ func runDiscover(port int) {
 		os.Exit(0)
 	}()
 	
-	//broadcastAddr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("255.255.255.255:%d", port))
-	broadcastAddr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("127.0.0.1:%d", port))
+	broadcastAddr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("255.255.255.255:%d", port))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error resolving UDP broadcast address: %s\n", err)
 	}
