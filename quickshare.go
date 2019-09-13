@@ -16,6 +16,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"strconv"
 )
 
 type Share struct {
@@ -28,6 +29,17 @@ type Share struct {
 type Host struct {
 	Name string
 	Shares int
+}
+
+func (h *Host) apply(s string) {
+	i := strings.Index(s, ":")
+	if i < 0 {
+		h.Name = s
+		h.Shares = 0
+	} else {
+		h.Name = s[:i]
+		h.Shares, _ = strconv.Atoi(s[i+1:])
+	}
 }
 
 
@@ -294,13 +306,34 @@ func runDiscover(port int) {
 	
 	buffer := make([]byte, 2048)
 	if Verbose > 0 { fmt.Println("Waiting for incoming messages ... ") }
+	hosts := make([]Host, 0)
 	for {
 		rlen, remote, err := con.ReadFrom(buffer)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error receiving udp packet: %s\n", err)
 		} else {
 			data := strings.TrimSpace(string(buffer[:rlen]))
-			fmt.Printf("  - %s (http://%s)\n", data, remote)
+			host := Host{}
+			host.apply(data)
+			
+			// Search for existing host
+			found := false
+			for i, h := range(hosts) {
+				if h.Name == host.Name {
+					found = true
+					if h.Shares != host.Shares {
+						// Shares have changed - Re-set the things
+						hosts = append(hosts[:i], hosts[i+1:]...)
+						found = false
+					}
+					break;
+				}
+			}
+			
+			if !found {
+				fmt.Printf("  - %s (http://%s) %d share(s)\n", host.Name, remote, host.Shares)
+				hosts = append(hosts, host)
+			}
 		}
 	}
 }
@@ -330,7 +363,7 @@ func udpServer(port int) {
 		
 		if data == "DISCOVER" {
 			// Reply
-			udp.WriteTo([]byte(hostname), remote)
+			udp.WriteTo([]byte(fmt.Sprintf("%s:%d", hostname, len(Shares))), remote)
 		}
 	}
 }
