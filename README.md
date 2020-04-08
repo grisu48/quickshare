@@ -18,8 +18,10 @@ Requirements: `go > 1.9`
 To share the file `README.md`
 
     $ quickshare README.md
+    Serving: README.md (/home/phoenix/Projects/quickshare/README.md)
+    2019/09/13 16:37:40 Started http://hostname:8249
 
-Adding more files by simply running `quickshare` again
+Adding more files by simply running `quickshare` again in another window
 
     $ quickshare LICENSE
 
@@ -27,7 +29,7 @@ Adding more files by simply running `quickshare` again
 
     $ quickshare README.md 
     Serving: README.md (/home/phoenix/Projects/quickshare/README.md)
-    2019/09/13 16:37:40 Started http://localhost:8249
+    2019/09/13 16:37:40 Started http://hostname:8249
 
 # Notice
 

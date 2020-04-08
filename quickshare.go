@@ -380,7 +380,7 @@ func main() {
 		if arg[0] == '-' {
 			if arg == "-h" || arg == "--help" {
 				fmt.Println("quickshare - Quick file share server")
-				fmt.Println("  2019, Felix Niederwanger\n")
+				fmt.Println("  2020, Felix Niederwanger\n")
 				fmt.Printf("Usage: %s [OPTIONS] [FILES]\n", os.Args[0])
 				fmt.Println("OPTIONS")
 				fmt.Println("  -h, --help               Print this help message")
@@ -497,7 +497,13 @@ func main() {
 		go udpServer(port)
 		
 		http.HandleFunc("/", httpHandler);
-		log.Printf("Started http://localhost:%d\n", port)
+		hostname, err := os.Hostname()
+		if err == nil {
+			log.Printf("Started http://%s:%d\n", hostname, port)
+		} else {
+			fmt.Fprintln(os.Stderr," Cannot determine hostanme: ", err)
+			log.Printf("Started http://localhost:%d\n", port)
+		}
 		http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	}
 }
